@@ -1,0 +1,9 @@
+node_modules
+dist
+coverage
+.env
+.env.*
+!.env.example
+.firebase
+.DS_Store
+service-account.json
