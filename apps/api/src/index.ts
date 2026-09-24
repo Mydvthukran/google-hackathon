@@ -1,25 +1,34 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { FakeLlm } from './fake-llm.js';
 import { setupSSE, sendSSE } from './utils/sse.js';
+import { configureGenkit, analyzeDocumentFlow } from './genkit.js';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const DEMO_MODE = process.env.GEMINI_API_KEY ? false : true;
+configureGenkit();
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', demoMode: DEMO_MODE });
 });
 
 app.post('/api/v1/analyze', async (req, res) => {
-  if (DEMO_MODE) {
-    const fake = new FakeLlm();
-    const result = await fake.analyze(req.body.text || '');
-    return res.json(result);
-  } else {
-    return res.status(501).json({ error: 'Not implemented in real mode yet.' });
+  try {
+    if (DEMO_MODE) {
+      const fake = new FakeLlm();
+      const result = await fake.analyze(req.body.text || '');
+      return res.json(result);
+    } else {
+      const result = await analyzeDocumentFlow(req.body.text || '', req.body.context || {});
+      return res.json(result);
+    }
+  } catch (error) {
+    console.error('Analysis error:', error);
+    return res.status(500).json({ error: 'Failed to analyze document.' });
   }
 });
 
