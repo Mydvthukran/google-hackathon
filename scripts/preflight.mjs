@@ -56,16 +56,18 @@ try {
 
 // 2. Check branch count (exactly 1)
 try {
-  const branches = execSync('git branch -a', { encoding: 'utf-8' })
+  const branchLines = execSync('git branch -a', { encoding: 'utf-8' })
     .split('\n')
     .filter(b => b.trim().length > 0 && !b.includes('HEAD'));
-  if (branches.length > 1) {
-    error(`Too many branches. Exactly 1 branch allowed, found ${branches.length}.`);
+  const uniqueBranches = new Set(
+    branchLines.map(b => b.replace('*', '').trim().replace(/^remotes\/[^\/]+\//, ''))
+  );
+  if (uniqueBranches.size > 1) {
+    error(`Too many branches. Exactly 1 branch allowed, found ${uniqueBranches.size}: ${Array.from(uniqueBranches).join(', ')}`);
   } else {
     info(`Exactly 1 branch found.`);
   }
 } catch (e) {
-  // If not a git repo yet, ignore
   console.warn(`[WARN] Git branch check failed: ${e.message}`);
 }
 
