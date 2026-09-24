@@ -1,5 +1,5 @@
 import { genkit, z } from 'genkit';
-import { googleAI, gemini15Flash } from '@genkit-ai/google-genai';
+import { googleAI } from '@genkit-ai/google-genai';
 
 let ai: any;
 export function configureGenkit() {
@@ -26,7 +26,7 @@ export async function analyzeDocumentFlow(text: string, context: any) {
   `;
   
   const response = await ai.generate({
-    model: gemini15Flash,
+    model: 'gemini-1.5-flash',
     prompt: prompt,
     output: {
       schema: z.object({
