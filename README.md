@@ -13,3 +13,8 @@ Upload document -> Extract text -> Gemini Analysis -> Decision Engine Triage -> 
 ## 4. Assumptions
 - This is not legal advice.
 - Jurisdiction-specific details rely on general information.
+
+## 5. Google Services Map
+| Service | Purpose | Module | Flag | Fallback |
+|---|---|---|---|---|
+| Cloud Vision API | Document OCR | `apps/api/src/adapters/google/ocr.ts` | `FEATURE_VISION_OCR` | FakeOcrAdapter |
