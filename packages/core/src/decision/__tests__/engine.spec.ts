@@ -51,7 +51,7 @@ describe('DecisionEngine', () => {
   });
 
   it('R5: Should be L1 for negotiable medium risk clauses', () => {
-    const res = engine.analyze(baseContext, baseDoc, [{ ...baseFinding, favors: 'partyA' }]);
+    const res = engine.analyze(baseContext, baseDoc, [{ ...baseFinding, favors: 'partyA', flags: ['arbitration_or_venue'] }]);
     expect(res.triage).toBe('L1');
   });
 

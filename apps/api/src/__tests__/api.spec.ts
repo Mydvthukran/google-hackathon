@@ -23,9 +23,9 @@ describe('API Routes', () => {
     // Large payload should be rejected (assuming middleware is configured)
     const largeString = 'a'.repeat(600 * 1024); // 600KB, max is 500KB
     // mock rejection
-    app.post('/api/v1/upload', express.raw({ limit: '500kb' }), (req, res) => res.json({ ok: true }));
+    app.post('/api/v1/upload', express.text({ limit: '500kb' }), (req, res) => res.json({ ok: true }));
     
-    const res = await request(app).post('/api/v1/upload').send(largeString);
+    const res = await request(app).post('/api/v1/upload').set('Content-Type', 'text/plain').send(largeString);
     expect(res.status).toBe(413); // Payload Too Large
   });
 });
