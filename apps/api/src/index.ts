@@ -50,7 +50,15 @@ app.get('/api/v1/analyze/stream', async (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`API running on port ${PORT} | DEMO_MODE: ${DEMO_MODE}`);
-});
+import { onRequest } from 'firebase-functions/v2/https';
+
+// For local dev, only start listener if not running in Firebase emulator or production
+if (process.env.NODE_ENV !== 'production' && !process.env.FUNCTIONS_EMULATOR) {
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () => {
+    console.log(`API running locally on port ${PORT} | DEMO_MODE: ${DEMO_MODE}`);
+  });
+}
+
+// Export as Firebase Function
+export const api = onRequest({ cors: true, maxInstances: 10 }, app);
