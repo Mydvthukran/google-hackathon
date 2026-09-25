@@ -52,11 +52,11 @@ app.get('/api/v1/analyze/stream', async (req, res) => {
 
 import { onRequest } from 'firebase-functions/v2/https';
 
-// For local dev, only start listener if not running in Firebase emulator or production
-if (process.env.NODE_ENV !== 'production' && !process.env.FUNCTIONS_EMULATOR) {
+// For local dev or standalone deployments (like Cloud Run), start the listener
+if (process.env.NODE_ENV !== 'production' || process.env.SERVE_HTTP === 'true') {
   const PORT = process.env.PORT || 3001;
   app.listen(PORT, () => {
-    console.log(`API running locally on port ${PORT} | DEMO_MODE: ${DEMO_MODE}`);
+    console.log(`API running on port ${PORT} | DEMO_MODE: ${DEMO_MODE}`);
   });
 }
 

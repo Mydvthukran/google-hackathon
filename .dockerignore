@@ -1,0 +1,8 @@
+node_modules
+dist
+.env
+.git
+.firebase
+.firebaserc
+firebase.json
+apps/web/dist
