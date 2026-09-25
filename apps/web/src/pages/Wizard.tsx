@@ -1,8 +1,40 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Wizard() {
   const [step, setStep] = useState(1);
   const [data, setData] = useState({});
+  const [fileText, setFileText] = useState('');
+  const navigate = useNavigate();
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setFileText(ev.target?.result as string);
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const startAnalysis = async () => {
+    setStep(3);
+    try {
+      const response = await fetch('/api/v1/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: fileText, context: data }),
+      });
+      const result = await response.json();
+      navigate('/results', { state: { result, context: data } });
+    } catch (error) {
+      console.error('Error analyzing document:', error);
+      // Optional: Handle error visually here
+    }
+  };
 
   return (
     <div className="wizard-container" aria-live="polite">
@@ -24,8 +56,8 @@ export default function Wizard() {
         <section className="card">
           <h2>Step 2: Upload Document</h2>
           <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Upload your contract or agreement securely. Supported formats: PDF, TXT.</p>
-          <input type="file" aria-label="Upload document" />
-          <button onClick={() => setStep(3)}>Start Analysis</button>
+          <input type="file" aria-label="Upload document" onChange={handleFileChange} />
+          <button onClick={startAnalysis} disabled={!fileText}>Start Analysis</button>
         </section>
       )}
       {step === 3 && (
@@ -33,8 +65,6 @@ export default function Wizard() {
           <h2>Analyzing Document...</h2>
           <div className="loading-spinner"></div>
           <div aria-busy="true" style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Extracting clauses and identifying key risks...</div>
-          {/* In a real app we'd trigger SSE stream here and redirect to results automatically */}
-          <button onClick={() => window.location.href = '/results'} style={{ background: 'var(--bg-surface-hover)', border: '1px solid var(--border-color)' }}>Mock: Go to Results</button>
         </section>
       )}
     </div>
